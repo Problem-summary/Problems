@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+  <script>
+    function getNthFibonacci(count){
+    	var arr = [1,1];   	
+    	for(var i = 0;i<arr.length;i++){
+    		var param = arr[i] +arr[i+1];
+    		arr.push(param);
+    		if(count == 0 || count == 1){
+	    		console.log(arr[count]);
+	    		break;
+    		};
+    		if(arr.length == count+1){
+    			console.log(arr[count]);
+    			break;
+    		}
+    	}	
+	}
+	getNthFibonacci(5);
+  </script>
+</body>
+</html>
