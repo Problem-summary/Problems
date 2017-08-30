@@ -1,0 +1,91 @@
+AMD CMD 区别
+
+1.AMD推崇依赖前置，在定义模块的时候就声明依赖的模块。CMD 推崇依赖就近，只有在需要用的时候才去require 执行。
+
+2.对于依赖的模块，AMD 提前执行，但是 CMD 的思想是 lazy loading, 延迟执行。但是现 RequireJS 2.0 也改成可以根据不同的写法进行延迟执行
+
+
+
+
+
+
+
+
+
+
+
+
+AMD
+
+AMD（Asynchronous Module Definition）就是异步加载模块，模块的加载不会影响后面代码的执行。所以依赖这个模块的代码都在一个回调函数中，等到所有模
+块加载完成之后就会执行这个回调函数。最常见的支持 AMD 规范的就是 RequireJS。
+
+在 AMD 中，模块的加载也是使用 require([dependencies], function(){}) 语句，但是不同于 CommonJS,它的参数除了有需要加载的模块文件之后，还需要约
+定一个回调函数，由这个回调函数去规定当模块都加载完成之后执行什么操作，加载的模块会以参数形式传入该回调函数函数，从而在回调函数内部就可以使用这些模块。
+
+而模块的定义主要是使用 define(id?, dependencies, factory)语句，其中 id 可选，定义模块的标识。 dependencies 可选参数，表示当前模块依赖的模块
+，是一个数组。 factory 是一个工厂方法，表示模块初始化需要执行的函数或者对象。一般我们会在这个 factory 中 return 出一个对象来暴露出我们的对外接口等等。
+
+举个栗子：
+定义一个模块 my_modules
+
+define(['math'], function() {
+    function bar() {
+        ...
+    }
+    return {
+        bar: bar
+    };
+});
+加载模块
+
+require([my_modules], function(my) {
+    my.bar();
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+CMD
+
+CMD（Common Module Definition）就是通用模块定义。CMD 是从国内发展出去的，实现主要是 SeaJS, 和 AMD 都是解决异步加载以及模块依赖的问题，
+但是在模块的定义方式上面有点不同。
+
+在 CMD 中，定义模块使用 define(id?, deps?,factory)，其中 id、depes 可以省略，字符串 id 表示模块标识，数组 deps 是模块依赖。当 factory
+是一个函数的时候表示模块的构造方法，默认接受三个参数 require、export、module。
+
+再举个栗子：
+定义一个模块 my_module
+
+define(function(require, export, module) {
+    var person = {name: 'abby', age: 20};
+    var _ = require('lodash'); // 需要的时候才去加载模块 lodash
+    var shallow = _clone(person);
+	// 支持异步加载模块,当多个模块加载完成之后才执行回调
+    require.async('./a', ./b', function(a, b) {
+        a.doSomething();
+        b.doSomething();
+    });
+    bar() {
+    	...
+    }
+    // 在导出模块的时候支持了 CommonJS 和 AMD 的写法。
+    return {
+        bar: bar
+    };
+    或者
+    module.exports = {
+        bar: bar
+    }
+    或者
+    exports.bar = bar //此时注意不能写成对象形式
+})
