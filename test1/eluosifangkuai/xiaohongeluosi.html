@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>俄罗斯方块小游戏</title>
+    <style>
+        #board tr td{
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<script  language="JavaScript">
+//    <!--难点：-->
+//    1.边界检查
+//    2.旋转
+//    3.点了开始之后，让他自己运行下去的机制，过程可以理解为：点击开始---》构造一个活动的图形---》设置定
+//      时器---》每次向下移动之后，检查是否触碰到了底部，如果触碰到底部，尝试消除行；如果没有触碰到底部，
+//      那么再构造一个活动图形，再设置定时器
+//函数总结
+//generateBlock();   moveDown();   moveLeft();  moveRight();  rotate();  checkLeftBorder();  checkRightBorder();  checkBottomBorder();  isCellValid(x, y);
+//erase();  paint();  updateBoard();  deleteLine();  eraseBoard();  paintBoard();  generateBlankLine();  updateScore();  keyControl();  begin(e);
+//  tbl,表示页面当中的table，这个table就是将要显示游戏的主面板
+//  status，表示游戏的状态，0，表示游戏未开始；1，表示游戏正在进行；2，表示游戏已经结束
+//  timer，是设置的定时器，我们在这个定时器内要给活动的图形做向下移动这个操作（moveDown）
+//  score，表示游戏得分，每消除一行得10分
+    var tbl;
+    var status=0;
+    var timer;
+    var score=0;
+
+
+//  board是一个18行10列的数组，对应我们所画的表格，用材存储每个表格的状态，初始时都为0，0表示空的方格，1表示已经填满的方格
+    var board=new Array(18);
+    for(var i=0;i<18;i++){
+        board[i]=new Array(10);
+    }
+
+    for(var i=0;i<18;i++){
+        for(var j=0;j<10;j++){
+            board[i][j]=0;
+        }
+    }
+
+
+//在页面中活动的方块activeBlock，有七种，我们通过随机产生0-6控制随机生成；活动的方块可以左右移动，可以旋转变形，可以向下加速；当活动的方块触碰到底部之后，我们的board[18][10]就会更新表格的状态
+    var activeBlock;
+
+//    生产方块函数，会随机生成一种方块
+    function generateBlock(){
+        activeBlock=null;
+        activeBlock=new Array(4);//每个活动方块有四个小方块，我们建立一个数组来存储小方块，每个小方块用x和y的位置来区分位置，组成的大的活动方块就是我们要的
+        var t=(Math.floor(Math.random()*20)+1)%7;//t是0-6的随机数
+        switch(t){
+            case 0:{
+                activeBlock[0]={x:0,y:4};
+                activeBlock[1]={x:1,y:4};
+                activeBlock[2]={x:0,y:5};
+                activeBlock[3]={x:1,y:5};
+                break;
+            }
+            case 1:{
+                activeBlock[0]={x:0,y:3};
+                activeBlock[1]={x:0,y:4};
+                activeBlock[2]={x:0,y:5};
+                activeBlock[3]={x:0,y:6};
+                break;
+            }
+            case 2:{
+                activeBlock[0]={x:0,y:5};
+                activeBlock[1]={x:1,y:4};
+                activeBlock[2]={x:1,y:5};
+                activeBlock[3]={x:2,y:4};
+                break;
+            }
+            case 3:{
+                activeBlock[0]={x:0,y:4};
+                activeBlock[1]={x:1,y:4};
+                activeBlock[2]={x:1,y:5};
+                activeBlock[3]={x:2,y:5};
+                break;
+            }
+            case 4:{
+                activeBlock[0]={x:0,y:4};
+                activeBlock[1]={x:1,y:4};
+                activeBlock[2]={x:1,y:5};
+                activeBlock[3]={x:1,y:6};
+                break;
+            }
+            case 5:{
+                activeBlock[0]={x:0,y:4};
+                activeBlock[1]={x:1,y:4};
+                activeBlock[2]={x:2,y:4};
+                activeBlock[3]={x:2,y:5};
+                break;
+            }
+            case 6:{
+                activeBlock[0]={x:0,y:5};
+                activeBlock[1]={x:1,y:4};
+                activeBlock[2]={x:1,y:5};
+                activeBlock[3]={x:1,y:6};
+                break;
+            }
+        }
+        //生产完小方格之后，生产完的活动小方格，需要检查能否放在初始化的位置
+        for(var i=0;i<4;i++){
+            if(!isCellValid(activeBlock[i].x,activeBlock[i].y)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+//检查坐标为x,y的是否在board里已经存在，存在的话说明新生成的这个方格不合法，也就是已经到头了，不能生成了，游戏结束；生产完的活动小方格，需要检查能否放在初始化的位置
+    function isCellValid(x,y){
+        if(x>17||x<0||y>9||y<0){
+            return false;
+        }
+        if(board[x][y]==1){
+            return false;
+        }
+        return true;
+    }
+
+//活动的方格向左移动
+    function moveLeft(){
+        if(checkLeftBorder()){
+            erase();
+            for(var i=0;i<4;i++){
+                activeBlock[i].y--;
+            }
+            paint();
+        }
+    }
+//活动的方格向右移动
+    function moveRight(){
+        if(checkRightBorder()){
+            erase();
+            for(var i=0;i<4;i++){
+                activeBlock[i].y++;
+            }
+            paint();
+        }
+    }
+//活动的方格向下移动
+    function moveDown(){
+        if(checkBottomBorder()){ //没有触底的话向下移动
+            erase();
+            for(var i=0;i<4;i++){
+                activeBlock[i].x++;
+            }
+            paint();
+        }
+        else{  //触底的话，应该先停止当前定时器，不再自动向下移动；然后更新我们的board[18][10]数组；尝试消行（消行，会更新分数，擦除整个面板，重绘面板；然后游戏继续：产生新图形，设置定时器）；
+            clearInterval(timer);
+            updateBoard();
+
+
+            var lines=deleteLine();
+            if(lines!=0){
+                score+=lines*10;
+                updateScore();
+                eraseBoard();
+                paintBoard();
+            }
+
+            if(!generateBlock()){
+                alert("Game over!");
+                status=2;
+                return;
+            }
+            paint();
+            timer=setInterval(moveDown,1000);
+
+        }
+    }
+
+//检查左边界，向左移动一个单位，看看是否合法
+    function checkLeftBorder(){
+        for(var i=0;i<activeBlock.length;i++){
+            if(activeBlock[i].y==0){
+                return false;
+            }
+            if(!isCellValid(activeBlock[i].x,activeBlock[i].y-1)){
+                return false;
+            }
+        }
+        return true;
+    }
+//检查右边界，向右移动一个单位，看看是否合法
+    function checkRightBorder(){
+        for(var i=0;i<activeBlock.length;i++){
+            if(activeBlock[i].y==9){
+                return false;
+            }
+            if(!isCellValid(activeBlock[i].x,activeBlock[i].y+1)){
+                return false;
+            }
+        }
+        return true;
+    }
+//检查下边界，向下移动一个单位，看看是否合法
+    function checkBottomBorder(){
+        for(var i=0;i<activeBlock.length;i++){
+            if(activeBlock[i].x==17){
+                return false;
+            }
+            if(!isCellValid(activeBlock[i].x+1,activeBlock[i].y)){
+                return false;
+            }
+        }
+        return true;
+    }
+//擦除
+    function erase(){
+        for(var i=0;i<4;i++){
+            tbl.rows[activeBlock[i].x].cells[activeBlock[i].y].style.backgroundColor='white';
+        }
+    }
+//重画
+    function paint(){
+        for(var i=0;i<4;i++){
+            tbl.rows[activeBlock[i].x].cells[activeBlock[i].y].style.backgroundColor='red';
+        }
+    }
+//更新board数组
+    function updateBoard(){
+        for(var i=0;i<4;i++){
+            board[activeBlock[i].x][activeBlock[i].y]=1;
+        }
+    }
+
+//消行
+function deleteLine(){
+    var lines=0;//能消行的行数
+
+    for(var i=0;i<18;i++){
+        var j=0;
+        for(;j<10;j++){
+            if(board[i][j]==0){//行里有空的，肯定不能消行
+               break;
+            }
+        }
+        if(j==10){//说明走了一遍for循环，没有空格空着
+            lines++;
+            if(i!=0){
+                for(var k=i-1;k>=0;k--){
+                    board[k+1]=board[k];//删除行
+                }
+            }
+            board[0]=generateBlankLine();
+        }
+    }
+    return lines;
+}
+//更新分数
+    function updateScore(){
+        document.getElementById("score").innerText=' '+score;
+    }
+//擦除整个面板
+    function  eraseBoard(){
+        for(var i=0;i<18;i++){
+            for(var j=0;j<10;j++){
+                tbl.rows[i].cells[j].style.backgroundColor='white';
+            }
+        }
+    }
+//重绘整个面板
+    function paintBoard(){
+        for(var i=0;i<18;i++){
+            for(var j=0;j<10;j++){
+                if(board[i][j]==1)
+                    tbl.rows[i].cells[j].style.backgroundColor='red';
+            }
+        }
+    }
+
+//产生一个空白行
+    function  generateBlankLine(){
+        var line=new Array(10);
+        for(var i=0;i<10;i++){
+            line[i]=0;
+        }
+        return line;
+    }
+
+
+//键盘控制函数
+    function keyControl(){
+        if(status!=1){
+            return;
+        }
+        var code=event.keyCode;
+        switch(code){
+            case 37:{
+                moveLeft();
+                break;
+            }
+            case 38:{
+                rotate();
+                break;
+            }
+            case 39:{
+                moveRight();
+                break;
+            }
+            case 40:{
+                moveDown();
+                break;
+            }
+        }
+    }
+//旋转函数
+//    function rotate(){
+//
+//    }
+
+//旋转, 因为旋转之后可能会有方格覆盖已有的方格.
+//先用一个tmpBlock,把activeBlock的内容都拷贝到tmpBlock,
+//对tmpBlock尝试旋转, 如果旋转后检测发现没有方格产生冲突,则
+//把旋转后的tmpBlock的值给activeBlock.
+function rotate(){
+    var tmpBlock = new Array(4);
+    for(var i=0; i<4; i++){
+        tmpBlock[i] = {x:0, y:0};
+    }
+    for(var i=0; i<4; i++){
+        tmpBlock[i].x = activeBlock[i].x;
+        tmpBlock[i].y = activeBlock[i].y;
+    }
+//先算四个点的中心点，则这四个点围绕中心旋转90度。(cx,cy)为中心点
+    var cx = Math.round((tmpBlock[0].x + tmpBlock[1].x + tmpBlock[2].x + tmpBlock[3].x)/4);
+    var cy = Math.round((tmpBlock[0].y + tmpBlock[1].y + tmpBlock[2].y + tmpBlock[3].y)/4);
+//旋转的主要算法. 可以这样分解来理解。
+//先假设围绕源点旋转。然后再加上中心点的坐标。
+
+    for(var i=0; i<4; i++){
+        tmpBlock[i].x = cx+cy-activeBlock[i].y;
+        tmpBlock[i].y = cy-cx+activeBlock[i].x;
+
+    }
+//检查旋转后方格是否合法.
+    for(var i=0; i<4; i++){
+        if(!isCellValid(tmpBlock[i].x,tmpBlock[i].y)){
+            return;
+        }
+    }
+//如果合法, 擦除
+    erase();
+//对activeBlock重新赋值
+    for(var i=0; i<4; i++){
+        activeBlock[i].x = tmpBlock[i].x;
+        activeBlock[i].y = tmpBlock[i].y;
+    }
+//重画
+    paint();
+}
+
+//开始函数
+    function begin(e){
+        e.disabled=true;
+        status=1;
+        tbl=document.getElementById("board");
+        if(!generateBlock()){
+            alert("came over!");
+            status=2;
+            return;
+        }
+        paint();
+        timer=setInterval(moveDown,1000);
+    }
+    document.onkeydown=keyControl;
+</script>
+<body>
+<input type="button"  value="begin"  onclick="begin(this);"/>Score: <span  id="score">0</span>
+<table  id="board"  cellpadding="0"  cellspacing="0"  border="1"  style="border-collapse: collapse;">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .message{
+            word-wrap: break-word;
+            margin-right:5px;
+            font-family: MicrosoftYaHei;
+            font-size: 14px;
+            color: #0E1A27;
+            letter-spacing: 0;
+            line-height: 28px;
+            /*max-width:690px;*/
+            word-break: break-all;
+
+        }
+    </style>
+</head>
+<body>
+<ul class="message">
+    <li><span className="address" >地址：</span><span >detailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddressdetailmerchantAddress</span></li>
+    <li><span className="time">营业时间：{detail.businessTime}</span></li>
+    <li><span className="phone">联系电话：{"+" + detail.contactAreaCode+" "+detail.contactTelNo}</span></li>
+    <li><span className="car">泊车许可：{detail.parkInfo}</span></li>
+</ul>
+</body>
+</html>

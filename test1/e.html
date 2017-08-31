@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        h2:before{
+            content:"我是额外文字！";
+        }
+        a.content:after{
+            content:attr(href);
+        }
+        ol{
+            list-style-type:none;
+            counter-reset:sectioncounter;
+        }
+        ol li:before{
+            content:'美女' counter(sectioncounter) ": ";
+            counter-increment:sectioncounter;
+        }
+        /*为不同的语言插入不同语言中的引号*/
+        :lang(en) > q{quotes: ' " ' ' " ';}
+        :lang(no) > q{quotes: ' " ' ' " ';}
+        :lang(ch) > q{quotes: '"'  '"';}
+        /*在q的前后插入引号*/
+        q:before{
+            content:open-quote;
+        }
+        q:after{
+            content:close-quote;
+        }
+    </style>
+</head>
+<body>
+    <h2>hahha</h2>
+    <a  class="content" href="http://www.zhangxinxu.com">此标签的href值是：</a>
+    <ol>
+        <li><img src="http://zhnagxinxu.com/image/study/s/s128/mm1.jpg" alt="" width="128px"  height="96px"></li>
+        <li><img src="http://zhnagxinxu.com/image/study/s/s128/mm3.jpg" alt="" width="128px"  height="96px"></li>
+    </ol>
+<p lang="en"><q>It's only work if somebody makes you do it.</q></p>
+<p lang="no"><q>Hvis du forteller meg nok en evits,sa skal jeg sla deg til jorden.</q></p>
+<p  lang="ch"><q>欢迎来到上海，欢迎参加世博会！</q></p>
+</body>
+</html>
