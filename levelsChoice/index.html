@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<link>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .big-div{
+            box-sizing: border-box;
+            max-width: 898px;
+            height: 540px;
+            margin:0 auto;
+            padding:15px;
+            position:relative;
+        }
+        .big-div div:nth-child(1){
+            height: 70px;
+        }
+        .big-div div:nth-child(4){
+            border-bottom: 1px solid transparent;
+        }
+        .small-div{
+            box-sizing: border-box;
+            height: 140px;
+            padding:10px 0;
+            border-bottom: 1px solid #ccc;
+            overflow: auto;
+        }
+        ul{
+            list-style: none;
+        }
+        li{
+            display:inline-block;
+            position: relative;
+            float: left;
+            margin: 5px 8px;
+            width: 92px;
+        }
+        span{
+            display: inline-block;
+            width: 72px;
+            overflow:hidden;
+            font-size:12px;
+            padding: 5px 10px;
+            text-align: left;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-decoration:none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .selected{
+            color: #fff;
+            background-color:#337ab7;
+            font-size:12px;
+         }
+        i{
+            position: absolute;
+            right: -8px;
+            bottom: -8px;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #86BA48;
+            background-color: #FFF;
+            border-radius: 8px;
+        }
+        .sub{
+            background: url("images/sub.png") 14px 14px no-repeat;
+            background-position:center;
+            background-size:contain;
+        }
+        .ok{
+            background: url("images/select-ok.png") 14px 14px no-repeat;
+            background-position:center;
+            background-size:contain;
+        }
+        .btn{
+            /*position:absolute;*/
+            /*bottom: 5px;*/
+            /*right: 10px;*/
+            background: #5d78af;
+            padding: 5px 10px;
+            color: #FFF;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div>
+        <span class="btn">确定</span>
+    </div>
+
+</div>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script  src="js/juicer.js"></script>
+<script src="js/index.js"></script>
+<script>
+    var arr=[[],[{industryTypeSec: "54", name: "分销", path: "4-54-0-0", type: "2"}],[],[{agentId: "1922083807", name: "打杂小分队嘟嘟嘟", path: "4-54-0-1922083807", type: "4"}]];
+    var obj = {
+        ids : ['industryType','industryTypeSec','industryTypeThd'],
+        names : null,
+        objs : ['firstTypes','secondTypes'],
+        id : 'agentId',
+        name : 'agents',
+        api : 'http://api6-dev.huangbaoche.com/channel/v1.0/e/agent/getAllAgentSource',
+        data : null,
+        props : arr,
+        func : null
+    }
+    var a=new lib.levelsChoices(obj);
+
+    $('div').on('click','.btn',function () {
+        console.log(a.getReturnArr());
+    })
+</script>
+</body>
+</html>

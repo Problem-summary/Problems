@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var str = "https://www.baidu.com";
+		// var str = "13800138000";
+
+		// var str = "+(1)533-222-334";
+		// var str = "Handsome.W@abc.com";
+		var re = /(https?:\/\/(www\.)?\w+)|(^1\d{10})|(\+86\d{2,3}-\d{7,8})|(0\d{2,3}-?\d{7,8}|(\+\(1\)\d{3}-\d{3}-\d{3})|[\w\.]@.+)/ig;
+
+		console.log(re.test(str));
+	</script>
+</body>
+</html>

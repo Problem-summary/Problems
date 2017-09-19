@@ -101,7 +101,7 @@ span{
     content:'';
     //可以设置css样式；
 }
-&before：{
+&：before{
     content:'';
     //可以设置css样式；
 }

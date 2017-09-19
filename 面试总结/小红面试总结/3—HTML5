@@ -55,7 +55,8 @@
                         sessionStorage在当前浏览器窗口关闭前有效；
                         localStorage始终有效，窗口或者浏览器关闭也一直有效；
 4.Canves画布：
-
+            var cvs=document.getElementById("#canves1");
+            var cxt=cvs.getContext("2d");
 
 
 

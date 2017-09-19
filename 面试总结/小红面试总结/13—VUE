@@ -1,4 +1,5 @@
 1.VUE.js
+
     VUE是以数据为驱动的，VUE自身将DOM和数据进行绑定，一旦创建绑定，DOM和数据将保持同步，每当数据发生变化，DOM会跟着变化。
 
     ViewModel是VUE的核心，它是VUE的一个实例。VUE实例时作用域某个HTML元素上的，这个HTML元素可以是body，也可以是是某个ID所指代的元素。

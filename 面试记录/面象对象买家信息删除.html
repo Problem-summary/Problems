@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>首页</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    
+    .head, li div {
+      display: inline-block;
+      width: 70px;
+      text-align: center;
+    }
+
+    li .id, li .sex, .id, .sex {
+      width: 15px;
+    }
+
+    li .name, .name {
+      width: 40px;
+    }
+
+    li .tel, .tel {
+      width: 90px;
+    }
+
+    li .del, .del {
+      width: 15px;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    .user-delete {
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="J_container">
+    <div class="record-head">
+      <div class="head id">序号</div><div class="head name">姓名</div><div class="head sex">性别</div><div class="head tel">电话号码</div><div class="head province">省份</div><div class="head">操作</div>
+    </div>
+    <ul id="J_List">
+     
+    </ul>
+  </div>
+
+<script>
+// 此处也可换成ES6的写法
+function Contact(userInfo){
+    this.init(userInfo);
+}
+ 
+// your code here 
+
+
+var jList = document.getElementById('J_List');
+
+Contact.prototype.init = function(userInfo){
+  var me = this;
+  
+  var tmpl = '<li>'
+                + '<div class="id">'+userInfo.id+'</div>'
+                + '<div class="name">'+userInfo.name+'</div>'
+                + '<div class="sex">'+userInfo.sex+'</div>'
+                + '<div class="tel">'+userInfo.number+'</div>'
+                + '<div class="province">'+userInfo.province+'</div>'
+                + '<div class="user-delete">删除</div>'
+              + '</li>';
+  jList.innerHTML += tmpl;
+  var aUserDelete = getByClass('user-delete', jList);
+  for(var i=0; i<aUserDelete.length; i++){
+    aUserDelete[i].onclick = function(){
+        me.delete.call(this);
+    };
+  }
+};
+
+Contact.prototype.delete = function(){
+  jList.removeChild(this.parentNode);
+};
+
+var data = [
+  {id: 1, name: '张三', sex: '男', number: '13788888888', province: '浙江'},
+  {id: 2, name: '李四', sex: '女', number: '13788887777', province: '四川'},
+  {id: 3, name: '王二', sex: '男', number: '13788889999', province: '广东'}
+];
+for(var i=0; i<data.length; i++){
+  new Contact(data[i]);
+}
+
+
+
+
+/**
+ * 查找符合className的元素
+ * @param className
+ * @param context
+ * @return {Array}
+ */
+function getByClass(className, context) {
+    context = context || document;
+    var result = [];
+    var arr = context.getElementsByTagName('*');
+    var re = new RegExp("\\b"+className+"\\b");
+    for(var i=0; i<arr.length; i++){
+        if(re.test(arr[i].className)){
+            result.push(arr[i]);
+        }
+    }
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

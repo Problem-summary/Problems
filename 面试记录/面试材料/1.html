@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+    #pyramid{ 
+        position: relative; 
+        margin: 100px auto; 
+        height: 500px; 
+        width: 100px;
+    } 
+    #pyramid > div { 
+        position: absolute; 
+        border-style: solid; 
+        border-width: 200px 0 200px 346px; 
+    } 
+    #pyramid > div:after { 
+        position: absolute; 
+        content: "Triangle"; 
+        color: #fff; left: -250px; 
+        text-align: center; 
+    }
+    #pyramid > div:first-child { 
+        border-color: #ff0000 transparent #ff0000 rgba(50, 50, 50, 0.6);
+    }
+    </style>
+</head>
+<body>
+    <div id="pyramid"> <div></div></div>
+   
+    <script>
+        
+    </script>
+</body>
+</html>

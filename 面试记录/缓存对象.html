@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var storage = {
+			getItem: function(key){
+				var data = this[key];
+				if(data.expireDate && data.expireDate.getTime() < new Date().getTime()){
+					return '已过期';
+				}
+				return this[key].value;
+			},
+			setItem: function(key, value, expireDate){
+				this[key] = {
+					value: value
+				};
+
+				if(expireDate){
+					this[key].expireDate = expireDate;
+				}
+
+			}
+		};
+	</script>
+</body>
+</html>
